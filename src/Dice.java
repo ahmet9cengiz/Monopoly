@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.Random;
 
-public class Dice {
+public class Dice implements Serializable {
    private Random rand;
    Dice(){
       rand = new Random();

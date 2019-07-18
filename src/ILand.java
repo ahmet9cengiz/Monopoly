@@ -1,4 +1,6 @@
-public interface ILand {
+import java.io.Serializable;
+
+public interface ILand extends Serializable {
 
    int getPosition();
    boolean isEmpty();

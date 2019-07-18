@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Player {
+public class Player implements Serializable {
    private String name;
    private int id;
    private double balance;
@@ -13,7 +14,7 @@ public class Player {
       this.id = 0;
       this.balance = 1000;
       this.position = 0;
-      this.landsOfPlayer = new ArrayList<Land>();
+      this.landsOfPlayer = new ArrayList<>();
    }
 
    public void setPosition(int newPos){

@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class GameBoard {
+public class GameBoard implements Serializable {
 
    private ArrayList<ILand> landMap;
 

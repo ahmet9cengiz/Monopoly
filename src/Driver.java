@@ -1,44 +1,50 @@
+import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Driver {
+   public static Scanner in = new Scanner(System.in);
+
    public static void main(String[] args) {
-      Game game = new Game();
-      LandFactory landFactory = new LandFactory();
+      GameService gameService = new GameService(new SerializableGameRepository());
 
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Istanbul", 400, 70));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Bursa", 300, 55));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Ankara", 320, 65));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.EMPTY_LAND,"",0,0));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Izmir", 270, 45));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Antalya", 260, 43));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Tekirdag", 200, 35));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.EMPTY_LAND,"",0,0));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Kocaeli", 200, 30));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Mersin", 230, 35));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Adana", 250, 40));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.EMPTY_LAND,"",0,0));
-      game.getGameBoard().addLand(landFactory.createLand(ILand.LandType.LAND,"Erzurum", 200, 25));
+      System.out.println("Would you like to play a new game(0), or load an existing game(1)");
 
+      int input = in.nextInt();
+      if (input == 0) {
+         NewGameRequest newGameRequest = new NewGameRequest(getPlayerNamesInput());
+         gameService.buildNewGame(newGameRequest);
+      } else if (input == 1) {
+         System.out.println("Please enter the name of the input file: ");
+         String inputFile = in.next();
+         gameService.load(inputFile);
+      }
 
-      game.addPlayer(new Player("Ahmet"));
-      game.addPlayer(new Player("Mehmet"));
-      game.addPlayer(new Player("Bahadir"));
-      game.addPlayer(new Player("Onur"));
-      game.addPlayer(new Player("Mert"));
+      promptEnterKey();
 
-      while(game.isContinuing()) {
-         PlayerMovedResponse response = game.moveNextPlayer();
+      while(gameService.isGameContinuing()) {
+         PlayerMovedResponse response = gameService.moveNextPlayer();
          if (response.needResponseForAction()) {
-            game.passRequestFromMainToBoard(getRequestForAction(response));
+            gameService.passRequestFromMainToGame(getRequestForAction(response));
          }
          else{
             printMessages(response);
          }
-         System.out.println("Press any key to move the next player");
+         System.out.println("Press press 1 to save the game, press 0 to quit, and press anything else to continue");
          try {
-            System.in.read();
+            String decision = in.nextLine();
+            if(decision.equals("0")){
+               gameService.setGameContinuing(false);
+            }
+            else if(decision.equals("1")){
+               System.out.println("Please enter a file name which you want the game to be saved to: ");
+               String inputFile = in.nextLine();
+               gameService.save(inputFile);
+            }
+            else{
+            }
          }
-         catch(Exception e){
+         catch(Exception e) {
             e.printStackTrace();
          }
       }
@@ -46,7 +52,6 @@ public class Driver {
    }
 
    public static String askToBuyLand(){
-      Scanner in = new Scanner(System.in);
       String input = "";
       try{
          input = in.nextLine();
@@ -68,5 +73,21 @@ public class Driver {
 
    public static void printMessages(PlayerMovedResponse response){
       System.out.println(response.getPrintMessage());
+   }
+
+   public static void promptEnterKey() {
+      System.out.println("Press \"ENTER\" to continue...");
+      Scanner console = new Scanner(System.in);
+      console.nextLine();
+   }
+
+   public static ArrayList<String> getPlayerNamesInput(){
+      ArrayList<String> players = new ArrayList<>();
+      players.add("Ahmet");
+      players.add("Mehmet");
+      players.add("Bahadir");
+      players.add("Onur");
+      players.add("Mert");
+      return players;
    }
 }
